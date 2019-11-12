@@ -1,0 +1,13 @@
+---
+ name: Extracting_Servers
+ pack: dane_sql
+ runner_type: python-script
+ description: Returns offline devices in SEPM
+ enabled: true
+ entry_point: extracting_servers.py
+ parameters:
+   dataframe:
+     description: "JSON Object for automation"
+     position: 1
+     required: true
+

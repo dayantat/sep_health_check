@@ -1,0 +1,50 @@
+---
+version: 1.0
+description: "Queries the SEPM DB"
+input:
+  - db_user
+  - db_server
+  - db_password
+  - db_name
+  - sql_query
+
+tasks:
+  sql_query:
+    action: dane_sql.SEPM_HC_Query
+    input:
+      db_user: <% ctx().db_user %>
+      db_server: <% ctx().db_server %>
+      db_password: <% ctx().db_password %>
+      db_name: <% ctx().db_name %>
+      sql_query: <% ctx().sql_query %>
+    next:
+      - when: <% succeeded() %>
+        publish:
+          - df: <% result().result %>
+        do:
+          - Servers_Check
+  Servers_Check:
+    action: dane_sql.Extracting_Servers
+    input:
+      dataframe: <% ctx().df %>
+    next:
+      - when: <% succeeded() %>
+        publish:
+          -dataframe: <% ctx()df %>
+        do:
+          - Health_Check
+  Health_Check:
+    action: dane_sql.Offline_in_SEPM
+    input:
+      dataframe: <% ctx().df %>
+    next:
+      - when: <% succeeded() %>
+        publish:
+          - dataframe: <% result().result %>
+        do:
+          - echo_dataframe
+  echo_dataframe:
+    action: core.echo
+    input:
+      message: "Returning NAME <% ctx().dataframe %>"
+

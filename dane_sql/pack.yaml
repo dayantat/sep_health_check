@@ -1,0 +1,10 @@
+---
+ref: dane_sql
+name : dane_sql
+description : template for pack creation
+keywords:
+  - sql
+  - dane
+version: 0.0.1
+author : Dimension Data
+email : auautomationrapteam@dimensiondata.com

@@ -1,0 +1,12 @@
+---
+ name: Offline_in_SEPM
+ pack: dane_sql
+ runner_type: python-script
+ description: Returns offline devices in SEPM
+ enabled: true
+ entry_point: offline_in_sepm.py
+ parameters:
+   dataframe:
+     description: "JSON Object for automation"
+     position: 1
+     required: true

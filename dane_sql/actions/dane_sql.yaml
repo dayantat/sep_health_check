@@ -1,0 +1,53 @@
+---
+  name: SEPM_HC_Query
+  pack: dane_sql
+  runner_type: python-script
+  description: checks my name
+  enabled: true
+  entry_point: dane_sql.py
+  parameters:
+    db_user:
+      type: string
+      description: "Enter Database User"
+      position: 1
+      required: true
+    db_server:
+      type: string
+      description: "SQL Server"
+      required: true
+      position: 2
+    db_password:
+      type: string
+      secret: true
+      description: "Database Password"
+      required: true
+      position: 3
+    db_name:
+      type: string
+      description: "Enter Database Name"
+      required: true
+      position: 4
+    sql_query:
+      type: string
+      description: "The SQL Query to run"
+      default: >
+        select i.COMPUTER_NAME
+                , AGENT_VERSION
+                , pat.version as AV_REVISION
+                , g.name as GROUP_NAME
+                , i.OPERATION_SYSTEM
+                        , dateadd(second, sa.LAST_UPDATE_TIME/1000, '1970-01-01') AS 'Last check-in (GMT)'
+                        , dateadd(s,convert(bigint,sa.[CREATION_TIME])/1000,'01-01-1970 13:00:00') as Creation_Time
+                , i.MAC_addr1 "MAC Address"
+                , IP_ADDR1_TEXT "IP Address"
+                        , i.COMPUTER_DESCRIPTION
+                from sem_agent as sa with (nolock) left outer join pattern pat on sa.pattern_idx=pat.pattern_idx
+                inner join v_sem_computer i on i.computer_id=sa.computer_id
+                inner join identity_map g on g.id=sa.group_id
+                inner join identity_map p on p.id=sa.last_server_id
+                inner join identity_map s on s.id=sa.domain_id
+                inner join identity_map q on q.id=sa.last_site_id
+                where
+                (sa.agent_type='105' or sa.agent_type='151') and sa.deleted='0' and I.DELETED = 0
+                order by group_name, operation_system, i.COMPUTER_name
+      position: 5
